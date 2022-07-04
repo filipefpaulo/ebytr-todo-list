@@ -1,11 +1,19 @@
 import express from 'express';
+import 'express-async-errors';
+import { ErrorMiddleware } from './middleware/ErrorMiddleware';
+import { Routes } from './routes';
 
 export class App {
   private _app: express.Express;
+  private routes = new Routes();
 
   constructor() {
     this._app = express();
     this.config();
+  }
+
+  get app() {
+    return this._app;
   }
 
   private config() {
@@ -14,6 +22,9 @@ export class App {
     app.use(express.json());
 
     app.get('/', (_req, res) => res.status(200).send('Everything is ok!'));
+    app.use(this.routes.route);
+
+    app.use(ErrorMiddleware);
   }
 
   listen(PORT: number | string) {
